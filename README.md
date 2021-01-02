@@ -8,6 +8,11 @@ $ ngx create-react-app <project name>
 $ npm install react-bootstrap bootstrap --save
 ### install [test library](testing-library.com) (used during dev time only)
 $ npm install @testing-library/react @testing-library/jest-dom --save-dev
+### install [Font Awesome](http://fontawesome.com)
+$ npm install --save @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons @fortawesome/react-fontawesome
+### install [Axios](https://github.com/axios/axios)
+$ npm install --save axios
+
 
 ## Libraries
 ### [Axios](https://github.com/axios/axios) - make request to REST APIs.
