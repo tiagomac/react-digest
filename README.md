@@ -8,3 +8,8 @@ $ ngx create-react-app <project name>
 $ npm install react-bootstrap bootstrap --save
 ### install [test library](testing-library.com) (used during dev time only)
 $ npm install @testing-library/react @testing-library/jest-dom --save-dev
+
+## Libraries
+### [Axios](https://github.com/axios/axios) - make request to REST APIs.
+
+
