@@ -11,6 +11,6 @@ $ npm install @testing-library/react @testing-library/jest-dom --save-dev
 
 ## Libraries
 ### [Axios](https://github.com/axios/axios) - make request to REST APIs.
-### [Font awesome](http://fontawesome.com) - Icons
+### [Font Awesome](http://fontawesome.com) - Icons
 
 
