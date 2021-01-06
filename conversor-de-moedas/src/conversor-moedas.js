@@ -5,15 +5,20 @@ import {Jumbotron, Button, Form, Col, Spinner, Alert, Modal} from 'react-bootstr
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleDoubleRight} from "@fortawesome/free-solid-svg-icons";
 import ListarMoedas from './listar-moedas';
+import axios from 'axios';
 
 function ConversorMoedas() {
+
+    const FIXED_URL = 'http://data.fixer.io/api/latest?access_key=eba7130a5b2d720ce43eb5fcddd47cc3';
 
     const [valor, setValor] = useState('1');
     const [moedaDe, setMoedaDe] = useState('BRL');
     const [moedaPara, setMoedaPara] = useState('AUD');
     const [exibirSpinner, setExibirSpinner] = useState(false);
     const [formValidado, setFormValidado] = useState(false);
-
+    const [exibirModal, setExibirModal] = useState(false);
+    const [resultadoConversao, setResultadoConversao] = useState('');
+    const [exibirMensagemErro, setExibirMensagemErro] = useState(false);
 
     function handleValor(event) {
         setValor(event.target.value.replace(/\D/g, ''));
@@ -27,18 +32,58 @@ function ConversorMoedas() {
         setMoedaPara(event.target.value);
     }
 
+    function handleFecharModal(event) {
+        setValor('1');
+        setMoedaDe('BRL');
+        setMoedaPara('USD');
+        setFormValidado(false);
+        setExibirModal(false);
+    }
+
     function converter(event) {
         event.preventDefault();
         setFormValidado(true);
         if (event.currentTarget.checkValidity() === true) {
-            alert('CORRETO');
+            setExibirSpinner(true);
+            axios.get(FIXED_URL)
+                .then(response => {
+                    const cotacao = obterCotacao(response.data);
+                    if (cotacao) {
+                        setResultadoConversao(`${valor} ${moedaDe} = ${cotacao} ${moedaPara}`);
+                        setExibirModal(true);
+                        setExibirSpinner(false);
+                        setExibirMensagemErro(false);
+                    } else {
+                        exibirErro();
+                    }
+
+                })
+                .catch(reason => {
+                    console.log(reason);
+                    exibirErro();
+                });
         }
+    }
+
+    function obterCotacao(dadosCotacao) {
+        if (!dadosCotacao || dadosCotacao.success !== true) {
+            return false;
+        }
+        const cotacaoDe = dadosCotacao.rates[moedaDe];
+        const cotacaoPara = dadosCotacao.rates[moedaPara];
+        const cotacao = (1 / cotacaoDe * cotacaoPara) * valor;
+        return cotacao.toFixed(2);
+    }
+
+    function exibirErro() {
+        setExibirMensagemErro(true);
+        setExibirSpinner(false);
     }
 
     return (
         <div>
             <h1>Conversor de moedas</h1>
-            <Alert variant={"danger"} show={true}>
+            <Alert variant={"danger"} show={exibirMensagemErro}>
                 Erro obtendo dados de conversão, tente novamente.
             </Alert>
             <Jumbotron>
@@ -68,7 +113,7 @@ function ConversorMoedas() {
                             </Form.Control>
                         </Col>
                         <Col sm={2}>
-                            <Button variant={'success'} type={'submit'}>
+                            <Button variant={'success'} type={'submit'} data-testid={'btn-converter'}>
                                 <span className={exibirSpinner ? null : 'hidden'}>
                                     <Spinner animation={"border"} size={"sm"}/>
                                 </span>
@@ -79,15 +124,15 @@ function ConversorMoedas() {
                         </Col>
                     </Form.Row>
                 </Form>
-                <Modal show={false}>
+                <Modal show={exibirModal} onHide={handleFecharModal} data-testid={'modal'}>
                     <Modal.Header closeButton>
                         <Modal.Title>Conversão</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        Resultado da conversão aqui...
+                        {resultadoConversao}
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant={"success"}>
+                        <Button variant={"success"} onClick={handleFecharModal}>
                             Nova conversão
                         </Button>
                     </Modal.Footer>
